@@ -23,6 +23,20 @@ body.gc-community-active {
     padding-top: 0 !important;
   }
 
+  // ── Hide default Discourse header ─────────────────────────
+  #d-header,
+  .d-header,
+  header.d-header {
+    display: none !important;
+  }
+
+  // ── Remove top padding compensation for hidden header ─────
+  #main-outlet-wrapper,
+  #main-outlet {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
   // ── Hide ALL default Discourse discovery chrome ────────────
   // Covers class names used across Discourse versions.
   .topic-list-container,
