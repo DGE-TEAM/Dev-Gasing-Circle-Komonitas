@@ -220,41 +220,22 @@ function renderLayout(wrapper, category, site, trackingState) {
 // ─── Target category slugs ───────────────────────────────────────────────────
 // Add every slug/name variant your "Komunitas" parent category might use.
 const TARGET_SLUGS = ["general", "komunitas"];
-const TARGET_NAMES = ["komunitas", "general", "community"];
 const ACTIVE_CLASS = "gc-community-active";
 
-function isTargetCategory(category) {
-  if (!category) return false;
-  const slug = (category.slug || "").toLowerCase();
-  const name = (category.name || "").toLowerCase();
-  return (
-    TARGET_SLUGS.some((s) => slug === s) ||
-    TARGET_NAMES.some((n) => name.includes(n))
-  );
-}
-
 function resolveCategory(url, site) {
-  // 1. Match against known slugs in site.categories
-  const fromSite = site?.categories?.find(isTargetCategory);
-  if (fromSite) return fromSite;
-
-  // 2. If URL contains a target slug: /c/<slug>/<id>  or  /c/<slug>
-  const urlMatch = url.match(/\/c\/([^/?#]+)(?:\/(\d+))?/);
+  // 1. URL must match /c/<target-slug> exactly (not subcategory pages)
+  //    Patterns: /c/general  /c/general/123  /c/komunitas  etc.
+  //    Subcategory URLs like /c/general/sub/456 are intentionally excluded.
+  const urlMatch = url.match(/\/c\/([^/?#]+)(?:\/(\d+))?\/?(?:[?#].*)?$/);
   if (urlMatch) {
     const slugInUrl = (urlMatch[1] || "").toLowerCase();
     if (TARGET_SLUGS.includes(slugInUrl)) {
-      return { slug: urlMatch[1], id: urlMatch[2] ? parseInt(urlMatch[2], 10) : null };
+      // Enrich with full site category object if available
+      const fromSite = site?.categories?.find(
+        (c) => (c.slug || "").toLowerCase() === slugInUrl
+      );
+      return fromSite || { slug: urlMatch[1], id: urlMatch[2] ? parseInt(urlMatch[2], 10) : null };
     }
-  }
-
-  // 3. Body class fallback  (body.category-general, body.category-komunitas, …)
-  const bodyClasses = Array.from(document.body.classList);
-  const catClass = bodyClasses.find(
-    (c) => c.startsWith("category-") && TARGET_SLUGS.some((s) => c.endsWith(s))
-  );
-  if (catClass) {
-    const slug = catClass.replace("category-", "");
-    return site?.categories?.find((c) => c.slug === slug) || { slug, id: null };
   }
 
   return null;
@@ -284,23 +265,24 @@ export default apiInitializer("1.8", (api) => {
 
   function deactivate(wrapper) {
     document.body.classList.remove(ACTIVE_CLASS);
-    wrapper.innerHTML = "";
+    if (wrapper) wrapper.innerHTML = "";
     if (_unsubscribe) { _unsubscribe(); _unsubscribe = null; }
   }
 
   api.onPageChange((url) => {
-    const wrapper = document.getElementById("gc-community-layout");
-    if (!wrapper) return;
-
     const site = api.container.lookup("service:site");
-    const trackingState = api.container.lookup("service:topic-tracking-state");
     const category = resolveCategory(url, site);
+    const wrapper = document.getElementById("gc-community-layout");
 
     if (!category) {
+      // Always clean up — wrapper may not exist on non-discovery pages
       deactivate(wrapper);
       return;
     }
 
+    if (!wrapper) return;
+
+    const trackingState = api.container.lookup("service:topic-tracking-state");
     activate(wrapper, category, site, trackingState);
   });
 });
