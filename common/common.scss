@@ -26,7 +26,8 @@ body.gc-community-active {
   // ── Hide default Discourse header ─────────────────────────
   #d-header,
   .d-header,
-  header.d-header {
+  header.d-header,
+  #header-list-area {
     display: none !important;
   }
 
