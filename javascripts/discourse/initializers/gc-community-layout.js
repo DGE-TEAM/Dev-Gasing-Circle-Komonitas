@@ -52,12 +52,43 @@ const PALETTES = {
   "default":           { bg: "#F8FAFC", border: "#E2E8F0", iconBg: "#F1F5F9" },
 };
 
+// ─── Allowed subcategory slugs (hide everything else) ───────────────────────
+const ALLOWED_SLUGS = new Set([
+  "mengenal-bilangan",
+  "bakalkubagi",
+  "pede",
+  "bilangan-bulat",
+  "ruang-guru",
+  "topik-santai",
+]);
+
+// ─── Map slug → settings key for admin-uploaded icons ───────────────────────
+const ICON_UPLOAD_MAP = {
+  "mengenal-bilangan": "mengenal_bilangan_icon",
+  "bakalkubagi":       "bakalkubagi_icon",
+  "pede":              "pede_icon",
+  "bilangan-bulat":    "bilangan_bulat_icon",
+  "ruang-guru":        "ruang_guru_icon",
+  "topik-santai":      "topik_santai_icon",
+};
+
 function getPalette(slug) {
   const key = Object.keys(PALETTES).find((k) => slug && slug.includes(k));
   return PALETTES[key || "default"];
 }
 
-function getIcon(slug) {
+function getIconHtml(slug) {
+  // Prefer admin-uploaded image from theme settings
+  const settingKey = ICON_UPLOAD_MAP[slug];
+  if (settingKey) {
+    try {
+      const url = settings[settingKey];
+      if (url) {
+        return `<img src="${url}" alt="" />`;
+      }
+    } catch (_) { /* settings not available */ }
+  }
+  // Fallback to built-in SVG
   const key = Object.keys(ICONS).find((k) => slug && slug.includes(k));
   return ICONS[key || "default"];
 }
@@ -95,7 +126,7 @@ function badgeHtml(unread, topicCount) {
 function buildCard(sub, parentSlug, trackingState) {
   const slug = sub.slug || "";
   const p = getPalette(slug);
-  const icon = getIcon(slug);
+  const icon = getIconHtml(slug);
   const name = sub.name || "";
   const desc =
     sub.description ||
@@ -157,6 +188,7 @@ function renderLayout(wrapper, category, site, trackingState) {
   const allCats = (site && site.categories) || [];
   let subcats = allCats
     .filter((c) => c.parent_category_id === parentId)
+    .filter((c) => ALLOWED_SLUGS.has(c.slug || ""))
     .sort((a, b) => (a.position || 0) - (b.position || 0));
 
   // Group subcategories into sections by slug heuristic

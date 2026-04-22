@@ -13,7 +13,7 @@ Komponen ini akan menutupi/mengganti antarmuka tampilan kategori standar bawaan 
 - **Visualisasi Ikon & Warna Kustom**: Setiap *card* sub-kategori memiliki konfigurasi palet warna (*background*, *border*, ikon) dan SVG kustom berdasarkan slug spesifik.
 - **Real-Time Notification Badge (TopicTrackingState)**: Angka topik yang belum terbaca (*New* atau *Unread*) akan otomatis tampil di sebelah masing-masing nama kategori. Pembaruan terjadi secara *real-time* memanfaatkan instansi `TopicTrackingState` bawaan Discourse tanpa perlu *reload* halaman.
 - **Smart Data Fetching**: Mengambil data utama secara lokal via `site.categories` untuk performa cepat (*zero loading* saat navigasi *history*), sambil melakukan proses *fetch* secara asinkron (di *background*) untuk memvalidasi pembaruan angka jumlah topik agar selalu akurat.
-- **Seamless Integrations**: Komponen ini menyuntikkan kelas `.gc-community-active` pada `<body>` saat berada di kategori target, sehingga CSS dapat menyembunyikan kontainer bawaan Discourse (seperti `.topic-list`, fitur bawaan `discovery`, dll.) tanpa mempengaruhi *style* di konfigurasi global forum.
+- **Seamless Integrations**: Komponen ini menyuntikkan kelas `.gc-community-active` pada `<body>` saat berada di kategori target, sehingga CSS dapat menyembunyikan seluruh UI bawaan Discourse termasuk *Header navigasi* utama (`#d-header`), kontainer (*container*) standar, daftar topik (`.topic-list`), dan elemen *discovery* lainnya. Hal ini menciptakan pengalaman *full-page* (satu halaman penuh) yang imersif tanpa mempengaruhi *style* di konfigurasi global forum.
 
 ## Struktur Direktori
 

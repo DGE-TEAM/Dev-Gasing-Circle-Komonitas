@@ -1,0 +1,23 @@
+mengenal_bilangan_icon:
+  default: ""
+  type: upload
+
+bakalkubagi_icon:
+  default: ""
+  type: upload
+
+pede_icon:
+  default: ""
+  type: upload
+
+bilangan_bulat_icon:
+  default: ""
+  type: upload
+
+ruang_guru_icon:
+  default: ""
+  type: upload
+
+topik_santai_icon:
+  default: ""
+  type: upload
