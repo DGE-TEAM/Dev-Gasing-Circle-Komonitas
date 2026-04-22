@@ -1,5 +1,5 @@
 // Gasing Circle – Community Category Layout
-// Hero + subcategory card grid on /c/general/forum/, with live TopicTrackingState badges.
+// Hero + subcategory card grid on /c/komunitas/forum/, with live TopicTrackingState badges.
 
 import { apiInitializer } from "discourse/lib/api";
 import {
@@ -65,14 +65,14 @@ function buildHero() {
     </div>`;
 }
 
-function buildCard(subcategory, categoryPath, trackingState) {
+function buildCard(subcategory, trackingState) {
   const { slug = "", name = "", id, topic_count: topicCount, description } = subcategory;
   const { palette } = CATEGORY_CONFIG[slug] || CATEGORY_CONFIG.default;
   const icon = getIconHtml(slug);
   const desc = description || (topicCount ? `${topicCount} topik tersedia` : `Diskusi seputar ${name}.`);
   const unread = getUnreadCount(trackingState, id);
   const badge = badgeHtml(unread, topicCount);
-  const url = `${categoryPath}/${slug}/${id}`;
+  const url = `/c/${TARGET_PATH.parent}/${slug}/${id}`;
   const unreadClass = unread > 0 ? " gc-card--unread" : "";
 
   return `
@@ -87,8 +87,8 @@ function buildCard(subcategory, categoryPath, trackingState) {
     </a>`;
 }
 
-function buildGroup(label, subcategories, categoryPath, trackingState) {
-  const cards = subcategories.map((sub) => buildCard(sub, categoryPath, trackingState)).join("");
+function buildGroup(label, subcategories, trackingState) {
+  const cards = subcategories.map((sub) => buildCard(sub, trackingState)).join("");
   return `
     <section class="gc-group">
       ${label ? `<h2 class="gc-group__title">${label}</h2>` : ""}
@@ -106,7 +106,7 @@ function getFilteredSubcategories(site, parentId) {
     .sort((a, b) => (a.position || 0) - (b.position || 0));
 }
 
-function buildSections(subcategories, categoryPath, trackingState) {
+function buildSections(subcategories, trackingState) {
   if (!subcategories.length) return "";
 
   const byGroup = {};
@@ -118,11 +118,11 @@ function buildSections(subcategories, categoryPath, trackingState) {
 
   const sections = CATEGORY_GROUPS
     .filter((group) => byGroup[group.id]?.length)
-    .map((group) => buildGroup(group.label, byGroup[group.id], categoryPath, trackingState))
+    .map((group) => buildGroup(group.label, byGroup[group.id], trackingState))
     .join("");
 
   // Fallback: show all flat if no group matched
-  return sections || buildGroup("", subcategories, categoryPath, trackingState);
+  return sections || buildGroup("", subcategories, trackingState);
 }
 
 // ─── Background API refresh ───────────────────────────────────────────────────
@@ -154,31 +154,17 @@ function refreshCategoriesFromApi(parentId, allCats, onRefreshComplete) {
     .catch(() => {});
 }
 
-// ─── Category path builder ────────────────────────────────────────────────────
-// Builds the full /c/... path for a category, used as base for card URLs.
-
-function getCategoryPath(category, site) {
-  if (typeof category.url === "string") {
-    // Discourse provides a full URL; strip trailing numeric ID segment if present
-    return category.url.replace(/\/\d+\/?$/, "").replace(/\/$/, "");
-  }
-  const parent = site?.categories?.find((c) => c.id === category.parent_category_id);
-  if (parent) return `/c/${parent.slug}/${category.slug}`;
-  return `/c/${category.slug}`;
-}
-
 // ─── Layout renderer ──────────────────────────────────────────────────────────
 
 function renderLayout(wrapper, category, site, trackingState) {
-  const subcategories = getFilteredSubcategories(site, category.id);
-  const categoryPath = getCategoryPath(category, site);
-  const sections = buildSections(subcategories, categoryPath, trackingState) ||
+  const subcategories = getFilteredSubcategories(site, category.parent_category_id);
+  const sections = buildSections(subcategories, trackingState) ||
     `<p class="gc-empty">Memuat kategori…</p>`;
 
   wrapper.innerHTML = buildHero() + `<div class="gc-sections">${sections}</div>`;
 
   const allCats = (site && site.categories) || [];
-  refreshCategoriesFromApi(category.id, allCats, () =>
+  refreshCategoriesFromApi(category.parent_category_id, allCats, () =>
     renderLayout(wrapper, category, site, trackingState)
   );
 }
