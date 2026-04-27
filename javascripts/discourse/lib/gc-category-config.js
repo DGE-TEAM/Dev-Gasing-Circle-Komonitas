@@ -87,5 +87,5 @@ export const CATEGORY_GROUPS = [
 // URL path that triggers the custom layout: /c/<parent>/<category>/
 export const TARGET_PATH = { parent: "general", category: "forum" };
 
-export const ACTIVE_CLASS = "gc-community-active";
-export const SUBCATEGORY_ACTIVE_CLASS = "gc-subcategory-active";
+export const ACTIVE_CLASS = "gc-forum-active";
+export const SUBCATEGORY_ACTIVE_CLASS = "gc-forum-subcategory-active";

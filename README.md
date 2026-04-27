@@ -1,36 +1,170 @@
-# Gasing Circle - Community Category Layout
+# Gasing Circle - Unified Community Layout
 
-Sebuah *Discourse Theme Component* khusus yang dirancang untuk menggantikan tampilan halaman kategori utama (secara default menargetkan slug `/c/komunitas` dan `/c/general`) pada platform forum Gasing Circle.
+**Versi Component:** Unified  
+**Author:** Digital Gasing Edukasi Team  
+**Platform:** Discourse Theme Component
 
-Komponen ini akan menutupi/mengganti antarmuka tampilan kategori standar bawaan dari Discourse (termasuk *Air Theme*) dan merendernya menjadi *custom layout* yang terdiri dari *Hero banner* yang modern serta *grid* sub-kategori yang interaktif.
+---
 
-## Fitur Utama
+The **Unified Community Layout** adalah satu Discourse Theme Component yang mengintegrasikan tiga area forum Gasing Circle dengan layout kustom, dashboard, dan hero banner masing-masing — dalam satu proyek yang kohesif.
 
-- **Custom Hero Banner**: Menampilkan *banner hero gradient* lengkap dengan maskot/ikon, *greeting*, dan deskripsi singkat.
-- **Dynamic Subcategory Grid**: Menampilkan sub-kategori ke dalam format *card*. Komponen akan otomatis membagi daftar sub-kategori ke dalam dua kelompok utama (menggunakan heuristik pada slug):
-  - **Konsep Dasar Matematika** (untuk slug yang mengandung kata `bilangan`, `bakalkubagi`, atau `pede`)
-  - **Diskusi Umum** (untuk sub-kategori lainnya)
-- **Visualisasi Ikon & Warna Kustom**: Setiap *card* sub-kategori memiliki konfigurasi palet warna (*background*, *border*, latar ikon) yang spesifik untuk setiap *slug*. Untuk ikonnya, administrator dapat mengunggah gambar pilihan (*custom icon image*) secara langsung lewat panel pengaturan *Theme Component* Discourse (*settings*), atau jika ditiadakan, secara otomatis akan merender ikon SVG default.
-- **Real-Time Notification Badge (TopicTrackingState)**: Angka topik yang belum terbaca (*New* atau *Unread*) akan otomatis tampil di sebelah masing-masing nama kategori. Pembaruan terjadi secara *real-time* memanfaatkan instansi `TopicTrackingState` bawaan Discourse tanpa perlu *reload* halaman.
-- **Smart Data Fetching**: Mengambil data utama secara lokal via `site.categories` untuk performa cepat (*zero loading* saat navigasi *history*), sambil melakukan proses *fetch* secara asinkron (di *background*) untuk memvalidasi pembaruan angka jumlah topik agar selalu akurat.
-- **Seamless Integrations**: Komponen ini menyuntikkan kelas `.gc-community-active` pada `<body>` saat berada di kategori target, sehingga CSS dapat menyembunyikan seluruh UI bawaan Discourse termasuk *Header navigasi* utama (`#d-header`), kontainer (*container*) standar, daftar topik (`.topic-list`), dan elemen *discovery* lainnya. Hal ini menciptakan pengalaman *full-page* (satu halaman penuh) yang imersif tanpa mempengaruhi *style* di konfigurasi global forum.
+## 🚀 Fitur Utama
 
-## Struktur Direktori
+Component ini mengelola tiga area forum dengan layout yang berbeda:
 
-- `about.json`: Konfigurasi meta data tema komponen.
-- `settings.yml`: Pemetaan konfigurasi *Theme Settings* admin, tempat registrasi variabel unggahan (*upload type*) untuk memodifikasi ikon (*mengenal_bilangan_icon*, *bakalkubagi_icon*, dsb) dari UI Discourse.
-- `common/common.scss`: Aturan *styling* (CSS) khusus untuk komponen ini. Bertugas untuk menyembunyikan (*hide*) komponen *default view* Discourse dan merapihkan seluruh tampilan secara penuh dan responsif.
-- `javascripts/discourse/lib/gc-category-config.js`: Menjadi sumber kebenaran tunggal (*Single Source of Truth*) untuk semua pemetaan *slug* ke palet warna, pengelompokan (*grouping*), parameter tata letak target (*TARGET_SLUGS*), dan konfigurasi pengaturan ikon bawaan admin.
-- `javascripts/discourse/initializers/gc-community-layout.js`: Mengandung seluruh logika bisnis untuk pembangunan markah (*HTML renderer*), verifikasi pengaturan parameter UI administrator, serta *state* notifikasi yang *real-time*.
-- `javascripts/discourse/templates/connectors/discovery-list-container-top/gc-community-layout.hbs`: Menambahkan kontainer kosong (`<div id="gc-community-layout"></div>`) di injeksi template bawaan Discourse sebagai media sisipan *layout* milik Javascript Initializer.
+### 1. Main Category Dashboard — `/c/general`
 
-## Persyaratan
-- Discourse versi terbaru dengan dukungan Javascript API initializer.
-- Karena bersifat dinamis dan langsung melakukan *injection* pada halaman, fungsionalitas ini akan selalu aktif dengan mode spesifik apabila *URL* sesuai dengan daftar parameter `TARGET_SLUGS`. Mengedit variabel konfigurasi `TARGET_SLUGS` pada berkas `gc-category-config.js` di dalam *library* direkomendasikan jika ingin menambahkan atau mengubah *slug* kategori yang ingin ditargetkan layaknya halaman *Home*.
+Menggantikan tampilan default Discourse di halaman kategori utama (`/c/general`) dengan dashboard komunitas interaktif.
 
-## Cara Perawatan
-Kondisi saat ini telah mengelola sistem konfigurasinya lewat berkas tersendiri (`lib/gc-category-config.js`) sebagai *Single Source of Truth*. 
-Apabila kelak ada sub-kategori baru yang memiliki warna atau ikon khas:
-1. Daftarkan entri baru Anda ke `CATEGORY_CONFIG` di `gc-category-config.js`. Tentukan nama kelas grup-nya di `CATEGORY_GROUPS`.
-2. Jika Anda menginginkan ikonnya bisa diubah via pengaturan kustom admin panel, atur parameter `settingKey` dan pastikan nama konfigurasinya sudah diregistrasikan di file konfigurasi YAML (*settings.yml*) bawaan *theme component*.
-3. Sistem secara otomatis akan menampilkan unggahan gambar tipe (admin UI) dari *settings.yml* selama file tersedia, sebaliknya akan otomatis memuat konfigurasi `icon` SVG khusus yang dicatat di config.
+- **Trending & Terbaru** — Feed topik live diambil via Discourse API
+- **Panduan Komunitas** — Accordion interaktif yang memuat topik dari tag `panduan`
+- **Challenge Bulan Ini** — Section dinamis dengan fire-level icons berdasarkan jumlah likes
+- Dikendalikan oleh: `gc-main-category-layout.js` + connector `discovery-list-container-top/gc-main-category-layout.hbs`
+
+### 2. Forum Category Layout — `/c/general/forum`
+
+Custom hero banner dan grid sub-kategori saat pengguna membuka hub forum utama.
+
+- **Badge unread/new** per sub-kategori, diambil real-time dari `TopicTrackingState` Discourse
+- Sub-kategori dikelompokkan berdasarkan grup: *Konsep Dasar Matematika* dan *Diskusi Umum*
+- Konfigurasi ikon, warna, dan gradien per sub-kategori terpusat di `gc-category-config.js`
+- Dikendalikan oleh: `gc-forum-layout.js` + connector `discovery-list-container-top/gc-forum-layout.hbs`
+
+### 3. Forum SubCategory Layout — `/c/general/forum/<slug>`
+
+Hero banner visual dan filter bar kustom untuk setiap halaman sub-kategori.
+
+- **Hero banner** dengan dekorasi simbol matematika (bisa dimatikan via settings)
+- **Breadcrumb navigation**: `Komonitas › Forum › <Nama Kategori>`
+- **Filter pills**: Latest, Most Replies, Trending
+- **Search bar** inline untuk memfilter topik secara real-time tanpa navigasi
+- **Tombol "Buat Thread"** yang langsung menarget `category_id` yang benar
+- Dikendalikan oleh: `gasing-layout.js` + `gasing-card-enhancer.js`
+
+---
+
+## 📂 Struktur Direktori
+
+```text
+Unified-Theme/
+├── about.json
+├── settings.yml
+├── README.md
+├── common/
+│   ├── common.scss             # Semua styling untuk ketiga layout (±51 KB)
+│   └── head_tag.html           # Custom head tag / external fonts
+├── locales/
+│   └── en.yml                  # Terjemahan & label settings
+└── javascripts/discourse/
+    ├── api-initializers/
+    │   ├── gasing-layout.js            # SubCategory: routing, body class, filter bar, card enhancer
+    │   ├── gasing-card-enhancer.js     # Enhances topic-list-item cards di halaman sub-kategori
+    │   └── gc-main-category-layout.js  # Main Dashboard: routing + fetch API
+    ├── initializers/
+    │   └── gc-forum-layout.js          # Forum Layout: routing, DOM render, TopicTrackingState
+    ├── lib/
+    │   └── gc-category-config.js       # Konfigurasi terpusat: ikon, warna, slug, group per sub-kategori
+    ├── connectors/
+    │   ├── above-main-container/
+    │   │   ├── gasing-hero-banner.js   # Glimmer component: hero banner sub-kategori
+    │   │   └── gasing-hero-banner.hbs  # Template hero banner
+    │   ├── bread-crumbs/
+    │   │   ├── gasing-filter-bar.js    # Glimmer component: filter bar (diinjeksi via JS)
+    │   │   └── gasing-filter-bar.hbs
+    │   └── discovery-list-container-top/
+    │       └── gc-main-category-layout.js  # Outlet router: Main Dashboard atau Forum Layout
+    └── templates/connectors/
+        └── discovery-list-container-top/
+            ├── gc-main-category-layout.hbs # Template dashboard utama
+            └── gc-forum-layout.hbs         # Template forum hub grid
+```
+
+---
+
+## 🧠 Routing & Isolasi Layout
+
+Karena ketiga layout menarget URL yang berdekatan, isolasi dilakukan melalui **body class** dan **CSS scoping**:
+
+| Layout | URL Target | Body Class | File Utama |
+|---|---|---|---|
+| Main Dashboard | `/c/general` (strict) | `.gc-community-active` | `gc-main-category-layout.js` |
+| Forum Hub | `/c/general/forum` (exact) | `.gc-forum-active` | `gc-forum-layout.js` |
+| SubCategory | URL dari `target_categories` setting | `.gasing-layout-active` | `gasing-layout.js` |
+
+Semua CSS menggunakan body class tersebut sebagai parent selector sehingga styling tiap layout **tidak saling bocor**.
+
+---
+
+## 📦 Sub-Kategori yang Didukung
+
+Dikonfigurasi di `gc-category-config.js` dan `settings.yml`:
+
+| Slug | Grup | Gradien Default |
+|---|---|---|
+| `mengenal-bilangan` | Konsep Dasar Matematika | `#4C1D95` → `#8B5CF6` |
+| `bakalkubagi` | Konsep Dasar Matematika | `#065F46` → `#10B981` |
+| `bilangan-bulat` | Konsep Dasar Matematika | `#78350F` → `#F59E0B` |
+| `pede` | Konsep Dasar Matematika | `#9D174D` → `#EC4899` |
+| `ruang-guru` | Diskusi Umum | `#312E81` → `#6366F1` |
+| `topik-santai` | Diskusi Umum | `#7C2D12` → `#F97316` |
+
+---
+
+## ⚙️ Konfigurasi (Settings)
+
+Dapat diubah dari **Discourse Admin › Customize › Themes**:
+
+### Ikon Sub-Kategori (Upload)
+| Setting | Keterangan |
+|---|---|
+| `mengenal_bilangan_icon` | Ikon untuk sub-kategori Mengenal Bilangan |
+| `bakalkubagi_icon` | Ikon untuk sub-kategori BakalKuBagi |
+| `pede_icon` | Ikon untuk sub-kategori PEDE |
+| `bilangan_bulat_icon` | Ikon untuk sub-kategori Bilangan Bulat |
+| `ruang_guru_icon` | Ikon untuk sub-kategori Ruang Guru |
+| `topik_santai_icon` | Ikon untuk sub-kategori Topik Santai |
+
+### Gradien Banner per Sub-Kategori
+Setiap sub-kategori memiliki pasangan `_gradient_start` dan `_gradient_end` (format hex, contoh: `#BE185D`).
+
+### Pengaturan Global
+| Setting | Default | Keterangan |
+|---|---|---|
+| `target_categories` | `general/mengenal-bilangan\|general/bakalkubagi\|...` | Slug sub-kategori yang menggunakan SubCategory Layout |
+| `banner_gradient_start` | `#3DD9A8` | Warna gradien kiri hero banner |
+| `banner_gradient_end` | `#1FB98A` | Warna gradien kanan hero banner |
+| `banner_text_color` | `#FFFFFF` | Warna teks judul di banner |
+| `primary_accent_color` | `#2563EB` | Warna tombol dan link aktif |
+| `show_math_decoration` | `true` | Tampilkan simbol matematika di background banner |
+| `pin_icon_color` | `#6366F1` | Warna indikator topik yang di-pin |
+
+---
+
+## 🛠️ Development Lokal
+
+Gunakan Discourse Theme CLI untuk development:
+
+```bash
+# Masuk ke direktori component
+cd "Unified-Theme"
+
+# Jalankan watcher (satu perintah untuk semua layout)
+discourse_theme watch .
+```
+
+> Dengan project yang sudah tergabung menjadi satu, kamu hanya perlu menjalankan **satu watcher**, tidak perlu tiga seperti sebelumnya.
+
+### Menambah Sub-Kategori Baru
+
+1. Tambahkan entri baru di `gc-category-config.js` (ikon, warna palette, gradien, grup)
+2. Tambahkan setting ikon dan gradien di `settings.yml`
+3. Tambahkan slug ke nilai default `target_categories` di `settings.yml`
+4. Tambahkan terjemahan di `locales/en.yml` jika diperlukan
+
+---
+
+## 🔗 Referensi
+
+- [Discourse Theme Component Guide](https://meta.discourse.org/t/beginners-guide-to-using-discourse-themes/91966)
+- [Discourse Plugin Outlet Reference](https://meta.discourse.org/t/list-of-plugin-outlet-hooks/32727)
+- [Discourse Theme CLI](https://meta.discourse.org/t/discourse-theme-cli/82950)

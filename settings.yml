@@ -70,3 +70,38 @@ topik_santai_gradient_start:
 topik_santai_gradient_end:
   type: string
   default: "#F97316"
+
+target_categories:
+  default: "general/mengenal-bilangan|general/bakalkubagi|general/pede|general/bilangan-bulat|general/ruang-guru|general/topik-santai"
+  description: "Daftar slug sub-kategori yang akan menggunakan layout baru (dipisahkan dengan pipe |). Format: parent-slug/child-slug"
+
+banner_gradient_start:
+  default: "#3DD9A8"
+  type: "string"
+  description: "Warna gradien awal untuk banner hero (kiri)"
+
+banner_gradient_end:
+  default: "#1FB98A"
+  type: "string"
+  description: "Warna gradien akhir untuk banner hero (kanan)"
+
+banner_text_color:
+  default: "#FFFFFF"
+  type: "string"
+  description: "Warna teks judul kategori"
+
+primary_accent_color:
+  default: "#2563EB"
+  type: "string"
+  description: "Warna aksen utama (tombol Add, link aktif)"
+
+show_math_decoration:
+  default: true
+  type: "bool"
+  description: "Tampilkan dekorasi simbol matematika di background banner"
+
+pin_icon_color:
+  default: "#6366F1"
+  type: "string"
+  description: "Warna untuk topik yang di-pin"
+

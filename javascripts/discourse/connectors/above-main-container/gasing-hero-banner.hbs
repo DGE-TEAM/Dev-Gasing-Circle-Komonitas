@@ -1,0 +1,27 @@
+{{#if this.shouldRender}}
+  <div class="gc-hero-banner" role="banner">
+    {{#if this.showDecoration}}
+      <div class="gc-hero-bg-decoration" aria-hidden="true">
+        <span class="gc-math-symbol gc-plus">+</span>
+        <span class="gc-math-symbol gc-times">×</span>
+        <span class="gc-math-symbol gc-minus">−</span>
+        <span class="gc-math-symbol gc-divide">÷</span>
+        <span class="gc-math-symbol gc-plus-2">+</span>
+        <span class="gc-math-symbol gc-times-2">×</span>
+      </div>
+    {{/if}}
+    <div class="gc-hero-content">
+      <div class="gc-hero-icon" aria-hidden="true">
+        <div class="gc-icon-row">
+          <span class="gc-op gc-op-plus">+</span>
+          <span class="gc-op gc-op-times">×</span>
+        </div>
+        <div class="gc-icon-row">
+          <span class="gc-op gc-op-minus">−</span>
+          <span class="gc-op gc-op-divide">÷</span>
+        </div>
+      </div>
+      <h1 class="gc-hero-title">{{this.categoryName}}</h1>
+    </div>
+  </div>
+{{/if}}

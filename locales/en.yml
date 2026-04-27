@@ -1,0 +1,11 @@
+en:
+  theme_metadata:
+    description: "Custom card-based layout untuk kategori komunitas Gasing"
+    settings:
+      target_categories: "Daftar sub-kategori yang menggunakan layout ini (format: parent-slug/child-slug, dipisahkan dengan |)"
+      banner_gradient_start: "Warna awal gradien banner"
+      banner_gradient_end: "Warna akhir gradien banner"
+      banner_text_color: "Warna teks judul kategori"
+      primary_accent_color: "Warna aksen utama (tombol, link aktif)"
+      show_math_decoration: "Tampilkan simbol matematika di background banner"
+      pin_icon_color: "Warna indikator pin"

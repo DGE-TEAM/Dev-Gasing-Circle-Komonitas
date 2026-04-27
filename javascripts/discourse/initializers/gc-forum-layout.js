@@ -69,11 +69,22 @@ const GC_LOGO_SVG = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.o
 
 function buildSubcategoryBanner(slug, name) {
   const { start, end } = getGradient(slug);
+  const icon = getIconHtml(slug);
   return `
-    <div class="gc-subcategory-banner" style="--banner-start:${start};--banner-end:${end}">
-      <div class="gc-subcategory-banner__inner">
-        <div class="gc-subcategory-banner__icon">${GC_LOGO_SVG}</div>
-        <h1 class="gc-subcategory-banner__title">${name}</h1>
+    <div class="gc-hero-banner" style="--gc-gradient-start:${start};--gc-gradient-end:${end}; margin-bottom: 0;" role="banner">
+      <div class="gc-hero-bg-decoration" aria-hidden="true">
+        <span class="gc-math-symbol gc-plus">+</span>
+        <span class="gc-math-symbol gc-times">×</span>
+        <span class="gc-math-symbol gc-minus">−</span>
+        <span class="gc-math-symbol gc-divide">÷</span>
+        <span class="gc-math-symbol gc-plus-2">+</span>
+        <span class="gc-math-symbol gc-times-2">×</span>
+      </div>
+      <div class="gc-hero-content">
+        <div class="gc-subcategory-banner__icon">
+          ${icon}
+        </div>
+        <h1 class="gc-hero-title">${name}</h1>
       </div>
     </div>`;
 }
@@ -284,7 +295,7 @@ export default apiInitializer("1.8", (api) => {
 
   api.onPageChange((url) => {
     const site = api.container.lookup("service:site");
-    const wrapper = document.getElementById("gc-community-layout");
+    const wrapper = document.getElementById("gc-forum-layout");
 
     const hubCategory = resolveCategory(url, site);
     if (hubCategory) {
