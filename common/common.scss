@@ -119,6 +119,11 @@ body.gc-forum-active {
   .create-topic,
   .tags-filter,
   h2.category-title,
+  .custom-category-boxes-container,
+  .category-boxes,
+  .category-boxes-with-topics,
+  #header-list-area,
+  .header-list-area,
   .list-area > *:not(.gc-forum-wrapper) {
     display: none !important;
   }
