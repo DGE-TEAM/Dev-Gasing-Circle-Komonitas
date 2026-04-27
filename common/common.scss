@@ -4,6 +4,106 @@
 // This fires regardless of category slug, bypassing Air theme defaults.
 // =============================================================
 
+// =============================================================
+// Gasing Circle – Subcategory Page Banner
+// Scoped to body.gc-subcategory-active; hides default header
+// and injects a gradient banner above the topic list.
+// =============================================================
+
+body.gc-subcategory-active {
+  #d-header,
+  .d-header,
+  header.d-header {
+    display: none !important;
+  }
+
+  #main-outlet-wrapper,
+  #main-outlet {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  .gc-subcategory-banner {
+    background: linear-gradient(
+      135deg,
+      var(--banner-start, #1e3a8a) 0%,
+      var(--banner-end, #7c3aed) 100%
+    );
+    padding: 36px 24px;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+  }
+
+  .gc-subcategory-banner__inner {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    max-width: 1120px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .gc-subcategory-banner__icon {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+    }
+  }
+
+  .gc-subcategory-banner__title {
+    font-family: "Plus Jakarta Sans", "Nunito", "Inter", sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+  }
+
+  @media (max-width: 768px) {
+    .gc-subcategory-banner {
+      padding: 24px 20px;
+    }
+
+    .gc-subcategory-banner__title {
+      font-size: 1.5rem;
+    }
+
+    .gc-subcategory-banner__icon {
+      width: 40px;
+      height: 40px;
+    }
+  }
+}
+
 body.gc-community-active {
   background: #f8fafc !important;
   min-height: 100vh;

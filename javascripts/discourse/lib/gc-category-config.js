@@ -8,6 +8,7 @@ export const CATEGORY_CONFIG = {
     </svg>`,
     palette: { bg: "#F5F0FF", border: "#C4B5FD", iconBg: "#EDE9FE" },
     settingKey: "mengenal_bilangan_icon",
+    gradient: { start: "#4C1D95", end: "#8B5CF6", settingKeyStart: "mengenal_bilangan_gradient_start", settingKeyEnd: "mengenal_bilangan_gradient_end" },
     group: "math",
   },
   "bakalkubagi": {
@@ -17,6 +18,7 @@ export const CATEGORY_CONFIG = {
     </svg>`,
     palette: { bg: "#F0FDFA", border: "#99F6E4", iconBg: "#CCFBF1" },
     settingKey: "bakalkubagi_icon",
+    gradient: { start: "#065F46", end: "#10B981", settingKeyStart: "bakalkubagi_gradient_start", settingKeyEnd: "bakalkubagi_gradient_end" },
     group: "math",
   },
   "bilangan-bulat": {
@@ -26,6 +28,7 @@ export const CATEGORY_CONFIG = {
     </svg>`,
     palette: { bg: "#FFFBEB", border: "#FDE68A", iconBg: "#FEF3C7" },
     settingKey: "bilangan_bulat_icon",
+    gradient: { start: "#78350F", end: "#F59E0B", settingKeyStart: "bilangan_bulat_gradient_start", settingKeyEnd: "bilangan_bulat_gradient_end" },
     group: "math",
   },
   "pede": {
@@ -37,6 +40,7 @@ export const CATEGORY_CONFIG = {
     </svg>`,
     palette: { bg: "#FFF0F8", border: "#FBCFE8", iconBg: "#FCE7F3" },
     settingKey: "pede_icon",
+    gradient: { start: "#9D174D", end: "#EC4899", settingKeyStart: "pede_gradient_start", settingKeyEnd: "pede_gradient_end" },
     group: "math",
   },
   "ruang-guru": {
@@ -47,6 +51,7 @@ export const CATEGORY_CONFIG = {
     </svg>`,
     palette: { bg: "#EEF2FF", border: "#C7D2FE", iconBg: "#E0E7FF" },
     settingKey: "ruang_guru_icon",
+    gradient: { start: "#312E81", end: "#6366F1", settingKeyStart: "ruang_guru_gradient_start", settingKeyEnd: "ruang_guru_gradient_end" },
     group: "general",
   },
   "topik-santai": {
@@ -57,6 +62,7 @@ export const CATEGORY_CONFIG = {
     </svg>`,
     palette: { bg: "#FFF7ED", border: "#FED7AA", iconBg: "#FFEDD5" },
     settingKey: "topik_santai_icon",
+    gradient: { start: "#7C2D12", end: "#F97316", settingKeyStart: "topik_santai_gradient_start", settingKeyEnd: "topik_santai_gradient_end" },
     group: "general",
   },
   default: {
@@ -82,3 +88,4 @@ export const CATEGORY_GROUPS = [
 export const TARGET_PATH = { parent: "general", category: "forum" };
 
 export const ACTIVE_CLASS = "gc-community-active";
+export const SUBCATEGORY_ACTIVE_CLASS = "gc-subcategory-active";

@@ -4,6 +4,7 @@
 import { apiInitializer } from "discourse/lib/api";
 import {
   ACTIVE_CLASS,
+  SUBCATEGORY_ACTIVE_CLASS,
   CATEGORY_CONFIG,
   CATEGORY_GROUPS,
   TARGET_PATH,
@@ -42,6 +43,39 @@ function badgeHtml(unreadCount, topicCount) {
   const label = count > 99 ? "99+" : String(count);
   const extraClass = unreadCount > 0 ? " gc-badge--unread" : "";
   return `<span class="gc-badge${extraClass}">${label}</span>`;
+}
+
+// ─── Gradient helper ──────────────────────────────────────────────────────────
+
+function getGradient(slug) {
+  const config = CATEGORY_CONFIG[slug];
+  if (!config?.gradient) return { start: "#1e3a8a", end: "#7c3aed" };
+  let { start, end } = config.gradient;
+  try { const s = settings[config.gradient.settingKeyStart]; if (s) start = s; } catch (_) {}
+  try { const e = settings[config.gradient.settingKeyEnd]; if (e) end = e; } catch (_) {}
+  return { start, end };
+}
+
+// ─── Subcategory banner builder ───────────────────────────────────────────────
+
+const GC_LOGO_SVG = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="24" cy="24" r="22" stroke="white" stroke-width="2" fill="none"/>
+  <path d="M24 2 A22 22 0 0 1 46 24 L36 24 A12 12 0 0 0 24 12 Z" fill="white" fill-opacity="0.95"/>
+  <path d="M46 24 A22 22 0 0 1 24 46 L24 36 A12 12 0 0 0 36 24 Z" fill="white" fill-opacity="0.75"/>
+  <path d="M24 46 A22 22 0 0 1 2 24 L12 24 A12 12 0 0 0 24 36 Z" fill="white" fill-opacity="0.55"/>
+  <path d="M2 24 A22 22 0 0 1 24 2 L24 12 A12 12 0 0 0 12 24 Z" fill="white" fill-opacity="0.35"/>
+  <circle cx="24" cy="24" r="4" fill="white"/>
+</svg>`;
+
+function buildSubcategoryBanner(slug, name) {
+  const { start, end } = getGradient(slug);
+  return `
+    <div class="gc-subcategory-banner" style="--banner-start:${start};--banner-end:${end}">
+      <div class="gc-subcategory-banner__inner">
+        <div class="gc-subcategory-banner__icon">${GC_LOGO_SVG}</div>
+        <h1 class="gc-subcategory-banner__title">${name}</h1>
+      </div>
+    </div>`;
 }
 
 // ─── HTML builders ────────────────────────────────────────────────────────────
@@ -163,7 +197,20 @@ function renderLayout(wrapper, category, site, trackingState) {
   wrapper.innerHTML = buildHero() + `<div class="gc-sections">${sections}</div>`;
 }
 
-// ─── URL resolver ─────────────────────────────────────────────────────────────
+// ─── URL resolvers ────────────────────────────────────────────────────────────
+
+function resolveSubcategory(url, site) {
+  const match = url.match(/\/c\/([^/?#]+)\/([^/?#]+)(?:\/(\d+))?\/?(?:[?#].*)?$/);
+  if (!match) return null;
+  const parentSlug = (match[1] || "").toLowerCase();
+  const categorySlug = (match[2] || "").toLowerCase();
+  if (parentSlug !== TARGET_PATH.parent) return null;
+  if (categorySlug === TARGET_PATH.category) return null; // handled by hub resolver
+  const allowedSlugs = new Set(Object.keys(CATEGORY_CONFIG).filter((k) => k !== "default"));
+  if (!allowedSlugs.has(categorySlug)) return null;
+  const fromSite = site?.categories?.find((cat) => (cat.slug || "").toLowerCase() === categorySlug);
+  return fromSite || { slug: categorySlug, id: match[3] ? parseInt(match[3], 10) : null, name: categorySlug };
+}
 
 function resolveCategory(url, site) {
   // Matches /c/<parent>/<category> or /c/<parent>/<category>/<id>
@@ -190,6 +237,7 @@ export default apiInitializer("1.8", (api) => {
   let unsubscribeTracking = null;
 
   function activate(wrapper, category, site, trackingState) {
+    document.body.classList.remove(SUBCATEGORY_ACTIVE_CLASS);
     document.body.classList.add(ACTIVE_CLASS);
     renderLayout(wrapper, category, site, trackingState);
 
@@ -214,8 +262,19 @@ export default apiInitializer("1.8", (api) => {
     }
   }
 
+  function activateSubcategoryBanner(wrapper, subcategory) {
+    document.body.classList.remove(ACTIVE_CLASS);
+    document.body.classList.add(SUBCATEGORY_ACTIVE_CLASS);
+    if (unsubscribeTracking) {
+      unsubscribeTracking();
+      unsubscribeTracking = null;
+    }
+    wrapper.innerHTML = buildSubcategoryBanner(subcategory.slug || "", subcategory.name || subcategory.slug || "");
+  }
+
   function deactivate(wrapper) {
     document.body.classList.remove(ACTIVE_CLASS);
+    document.body.classList.remove(SUBCATEGORY_ACTIVE_CLASS);
     if (wrapper) wrapper.innerHTML = "";
     if (unsubscribeTracking) {
       unsubscribeTracking();
@@ -225,17 +284,23 @@ export default apiInitializer("1.8", (api) => {
 
   api.onPageChange((url) => {
     const site = api.container.lookup("service:site");
-    const category = resolveCategory(url, site);
     const wrapper = document.getElementById("gc-community-layout");
 
-    if (!category) {
-      deactivate(wrapper);
+    const hubCategory = resolveCategory(url, site);
+    if (hubCategory) {
+      if (!wrapper) return;
+      const trackingState = api.container.lookup("service:topic-tracking-state");
+      activate(wrapper, hubCategory, site, trackingState);
       return;
     }
 
-    if (!wrapper) return;
+    const subcategory = resolveSubcategory(url, site);
+    if (subcategory) {
+      if (!wrapper) return;
+      activateSubcategoryBanner(wrapper, subcategory);
+      return;
+    }
 
-    const trackingState = api.container.lookup("service:topic-tracking-state");
-    activate(wrapper, category, site, trackingState);
+    deactivate(wrapper);
   });
 });

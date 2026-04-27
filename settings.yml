@@ -21,3 +21,52 @@ ruang_guru_icon:
 topik_santai_icon:
   default: ""
   type: upload
+
+# Gradient banner colors for each subcategory page (hex values, e.g. #BE185D)
+mengenal_bilangan_gradient_start:
+  type: string
+  default: "#4C1D95"
+
+mengenal_bilangan_gradient_end:
+  type: string
+  default: "#8B5CF6"
+
+bakalkubagi_gradient_start:
+  type: string
+  default: "#065F46"
+
+bakalkubagi_gradient_end:
+  type: string
+  default: "#10B981"
+
+pede_gradient_start:
+  type: string
+  default: "#9D174D"
+
+pede_gradient_end:
+  type: string
+  default: "#EC4899"
+
+bilangan_bulat_gradient_start:
+  type: string
+  default: "#78350F"
+
+bilangan_bulat_gradient_end:
+  type: string
+  default: "#F59E0B"
+
+ruang_guru_gradient_start:
+  type: string
+  default: "#312E81"
+
+ruang_guru_gradient_end:
+  type: string
+  default: "#6366F1"
+
+topik_santai_gradient_start:
+  type: string
+  default: "#7C2D12"
+
+topik_santai_gradient_end:
+  type: string
+  default: "#F97316"
