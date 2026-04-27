@@ -463,6 +463,9 @@ body.gc-community-active {
   .topic-list,
   .contents > .topic-list-bottom,
   .show-more,
+  .custom-category-boxes-container,
+  .category-boxes,
+  .category-boxes-with-topics,
   .container.list-container .topic-list-container > :not(#gc-community-layout) {
     display: none !important;
   }
