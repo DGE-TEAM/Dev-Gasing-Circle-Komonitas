@@ -215,10 +215,18 @@ function resolveSubcategory(url, site) {
   if (!match) return null;
   const parentSlug = (match[1] || "").toLowerCase();
   const categorySlug = (match[2] || "").toLowerCase();
-  if (parentSlug !== TARGET_PATH.parent) return null;
-  if (categorySlug === TARGET_PATH.category) return null; // handled by hub resolver
+  
+  // Skip if it's the main forum layout
+  if (parentSlug === TARGET_PATH.parent && categorySlug === TARGET_PATH.category) return null;
+  
   const allowedSlugs = new Set(Object.keys(CATEGORY_CONFIG).filter((k) => k !== "default"));
   if (!allowedSlugs.has(categorySlug)) return null;
+
+  // Validate against settings.target_categories
+  const targets = (settings.target_categories || "").split("|").map(s => s.trim().toLowerCase());
+  const currentPath = `${parentSlug}/${categorySlug}`;
+  if (!targets.includes(currentPath)) return null;
+
   const fromSite = site?.categories?.find((cat) => (cat.slug || "").toLowerCase() === categorySlug);
   return fromSite || { slug: categorySlug, id: match[3] ? parseInt(match[3], 10) : null, name: categorySlug };
 }

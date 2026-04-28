@@ -72,7 +72,7 @@ topik_santai_gradient_end:
   default: "#F97316"
 
 target_categories:
-  default: "general/mengenal-bilangan|general/bakalkubagi|general/pede|general/bilangan-bulat|general/ruang-guru|general/topik-santai"
+  default: "general/mengenal-bilangan|general/bakalkubagi|general/pede|general/bilangan-bulat|general/ruang-guru|general/topik-santai|general/challenges|gasing-library/materi-trainer-utama|gasing-library/permainan-pelatihan|gasing-library/musik-gasing"
   description: "Daftar slug sub-kategori yang akan menggunakan layout baru (dipisahkan dengan pipe |). Format: parent-slug/child-slug"
 
 banner_gradient_start:
@@ -105,3 +105,51 @@ pin_icon_color:
   type: "string"
   description: "Warna untuk topik yang di-pin"
 
+
+challenges_icon:
+  default: ""
+  type: upload
+
+materi_trainer_utama_icon:
+  default: ""
+  type: upload
+
+permainan_pelatihan_icon:
+  default: ""
+  type: upload
+
+musik_gasing_icon:
+  default: ""
+  type: upload
+
+challenges_gradient_start:
+  type: string
+  default: "#A78BFA"
+
+challenges_gradient_end:
+  type: string
+  default: "#93C5FD"
+
+materi_trainer_utama_gradient_start:
+  type: string
+  default: "#34D399"
+
+materi_trainer_utama_gradient_end:
+  type: string
+  default: "#6EE7B7"
+
+permainan_pelatihan_gradient_start:
+  type: string
+  default: "#FBBF24"
+
+permainan_pelatihan_gradient_end:
+  type: string
+  default: "#FDE047"
+
+musik_gasing_gradient_start:
+  type: string
+  default: "#F472B6"
+
+musik_gasing_gradient_end:
+  type: string
+  default: "#FDA4AF"

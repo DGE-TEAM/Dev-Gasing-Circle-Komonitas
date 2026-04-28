@@ -65,6 +65,50 @@ export const CATEGORY_CONFIG = {
     gradient: { start: "#7C2D12", end: "#F97316", settingKeyStart: "topik_santai_gradient_start", settingKeyEnd: "topik_santai_gradient_end" },
     group: "general",
   },
+  "challenges": {
+    icon: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 6L24 15H34L26 21L29 30L20 24L11 30L14 21L6 15H16L20 6Z" stroke="#8B5CF6" stroke-width="2" fill="none" stroke-linejoin="round"/>
+    </svg>`,
+    palette: { bg: "#F5F3FF", border: "#DDD6FE", iconBg: "#EDE9FE" },
+    settingKey: "challenges_icon",
+    gradient: { start: "#A78BFA", end: "#93C5FD", settingKeyStart: "challenges_gradient_start", settingKeyEnd: "challenges_gradient_end" },
+    group: "hidden",
+  },
+  "materi-trainer-utama": {
+    icon: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="8" y="10" width="24" height="20" rx="2" stroke="#10B981" stroke-width="2" fill="none"/>
+      <line x1="12" y1="16" x2="28" y2="16" stroke="#10B981" stroke-width="2"/>
+      <line x1="12" y1="22" x2="22" y2="22" stroke="#10B981" stroke-width="2"/>
+    </svg>`,
+    palette: { bg: "#ECFDF5", border: "#A7F3D0", iconBg: "#D1FAE5" },
+    settingKey: "materi_trainer_utama_icon",
+    gradient: { start: "#34D399", end: "#6EE7B7", settingKeyStart: "materi_trainer_utama_gradient_start", settingKeyEnd: "materi_trainer_utama_gradient_end" },
+    group: "library",
+  },
+  "permainan-pelatihan": {
+    icon: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="14" cy="20" r="6" stroke="#F59E0B" stroke-width="2" fill="none"/>
+      <circle cx="26" cy="20" r="6" stroke="#F59E0B" stroke-width="2" fill="none"/>
+      <path d="M20 12 L20 28" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+    </svg>`,
+    palette: { bg: "#FFFBEB", border: "#FDE68A", iconBg: "#FEF3C7" },
+    settingKey: "permainan_pelatihan_icon",
+    gradient: { start: "#FBBF24", end: "#FDE047", settingKeyStart: "permainan_pelatihan_gradient_start", settingKeyEnd: "permainan_pelatihan_gradient_end" },
+    group: "library",
+  },
+  "musik-gasing": {
+    icon: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="28" r="4" stroke="#EC4899" stroke-width="2" fill="none"/>
+      <circle cx="28" cy="26" r="4" stroke="#EC4899" stroke-width="2" fill="none"/>
+      <line x1="16" y1="28" x2="16" y2="10" stroke="#EC4899" stroke-width="2"/>
+      <line x1="32" y1="26" x2="32" y2="8" stroke="#EC4899" stroke-width="2"/>
+      <path d="M16 10 C24 8 28 6 32 8" stroke="#EC4899" stroke-width="2" fill="none"/>
+    </svg>`,
+    palette: { bg: "#FDF2F8", border: "#FBCFE8", iconBg: "#FCE7F3" },
+    settingKey: "musik_gasing_icon",
+    gradient: { start: "#F472B6", end: "#FDA4AF", settingKeyStart: "musik_gasing_gradient_start", settingKeyEnd: "musik_gasing_gradient_end" },
+    group: "library",
+  },
   default: {
     icon: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="8" y="8" width="24" height="24" rx="4" stroke="#94A3B8" stroke-width="2" fill="none"/>
@@ -82,6 +126,7 @@ export const CATEGORY_CONFIG = {
 export const CATEGORY_GROUPS = [
   { id: "math",    label: "Konsep Dasar Matematika" },
   { id: "general", label: "Diskusi Umum" },
+  { id: "library", label: "Gasing Library" },
 ];
 
 // URL path that triggers the custom layout: /c/<parent>/<category>/
