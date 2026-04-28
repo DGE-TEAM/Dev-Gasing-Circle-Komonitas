@@ -7,6 +7,9 @@ const ICONS = {
   heart: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
   </svg>`,
+  heartFill: `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+  </svg>`,
   comment: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
   </svg>`,
@@ -215,7 +218,7 @@ const openDropdownPortal = (btn, ctx, currentUser) => {
 
 // ─── Card enhancement ─────────────────────────────────────────────────────────
 
-const enhanceCard = (card, currentUser) => {
+const enhanceCard = (card, currentUser, api) => {
   if (!card || card.dataset.gcEnhanced === "1") return;
   card.dataset.gcEnhanced = "1";
 
@@ -354,28 +357,140 @@ const enhanceCard = (card, currentUser) => {
   // ── Footer ─────────────────────────────────────────────────────────────────
   const footer = document.createElement("div");
   footer.className = "gc-card-footer";
-  footer.innerHTML = `
-    <div class="gc-metrics">
-      <span class="gc-metric" title="Suka">${ICONS.heart}<span>${formatCount(likes)}</span></span>
-      <span class="gc-metric" title="Balasan">${ICONS.comment}<span>${formatCount(posts)}</span></span>
-      <span class="gc-metric" title="Dilihat">${ICONS.eye}<span>${formatCount(views)}</span></span>
-    </div>
-    <div class="gc-card-actions">
-      <button type="button" class="gc-action-btn gc-bookmark-action" aria-label="Bookmark" title="Bookmark">
-        ${ICONS.bookmark}
-      </button>
-      <button type="button" class="gc-action-btn gc-more-action" aria-label="Opsi lainnya" aria-haspopup="true" aria-expanded="false" title="Opsi lainnya">
-        ${ICONS.more}
-      </button>
-    </div>
-  `;
+
+  // Build footer elements programmatically so we can attach real event handlers
+  const metricsDiv = document.createElement("div");
+  metricsDiv.className = "gc-metrics";
+
+  // Like button
+  const likeBtn = document.createElement("button");
+  likeBtn.type = "button";
+  likeBtn.className = "gc-metric gc-action-like";
+  likeBtn.title = "Suka";
+  likeBtn.innerHTML = `${ICONS.heart}<span class="gc-count-like">${formatCount(likes)}</span>`;
+
+  // Comment button
+  const commentBtn = document.createElement("button");
+  commentBtn.type = "button";
+  commentBtn.className = "gc-metric gc-action-comment";
+  commentBtn.title = "Balasan";
+  commentBtn.innerHTML = `${ICONS.comment}<span>${formatCount(posts)}</span>`;
+
+  // Views (static, not interactive)
+  const viewsSpan = document.createElement("span");
+  viewsSpan.className = "gc-metric";
+  viewsSpan.title = "Dilihat";
+  viewsSpan.innerHTML = `${ICONS.eye}<span>${formatCount(views)}</span>`;
+
+  metricsDiv.append(likeBtn, commentBtn, viewsSpan);
+
+  const actionsDiv = document.createElement("div");
+  actionsDiv.className = "gc-card-actions";
+
+  // Bookmark button
+  const bookmarkBtn = document.createElement("button");
+  bookmarkBtn.type = "button";
+  bookmarkBtn.className = "gc-action-btn gc-bookmark-action";
+  bookmarkBtn.setAttribute("aria-label", "Bookmark");
+  bookmarkBtn.title = "Bookmark";
+  bookmarkBtn.innerHTML = ICONS.bookmark;
+
+  // More button
+  const moreBtn = document.createElement("button");
+  moreBtn.type = "button";
+  moreBtn.className = "gc-action-btn gc-more-action";
+  moreBtn.setAttribute("aria-label", "Opsi lainnya");
+  moreBtn.setAttribute("aria-haspopup", "true");
+  moreBtn.setAttribute("aria-expanded", "false");
+  moreBtn.title = "Opsi lainnya";
+  moreBtn.innerHTML = ICONS.more;
+
+  actionsDiv.append(bookmarkBtn, moreBtn);
+  footer.append(metricsDiv, actionsDiv);
   card.appendChild(footer);
 
+  // ── Like — fetch first post, call Discourse post_actions API ──────────────
+  let isFetchingLike = false;
+
+  const updateLikeBtn = (liked, count) => {
+    likeBtn.innerHTML = `${liked ? ICONS.heartFill : ICONS.heart}<span class="gc-count-like">${formatCount(count)}</span>`;
+    likeBtn.classList.toggle("is-liked", liked);
+  };
+
+  likeBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!currentUser) {
+      window.location.href = `/login?return_path=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
+    if (!topicId || isFetchingLike) return;
+
+    isFetchingLike = true;
+    likeBtn.style.opacity = "0.5";
+
+    try {
+      const data = await ajax(`/t/${topicId}.json`);
+      const firstPost = data?.post_stream?.posts?.[0];
+      if (!firstPost) throw new Error("No first post");
+
+      const likeAction = (firstPost.actions_summary || []).find((a) => a.id === 2);
+      const isLiked = likeAction?.acted || false;
+      const currentCount = parseInt(likeBtn.querySelector(".gc-count-like")?.textContent || "0", 10);
+
+      if (isLiked) {
+        await ajax(`/post_actions/${firstPost.id}.json?post_action_type_id=2`, { type: "DELETE" });
+        updateLikeBtn(false, Math.max(0, currentCount - 1));
+      } else {
+        await ajax("/post_actions.json", {
+          type: "POST",
+          data: { id: firstPost.id, post_action_type_id: 2 },
+        });
+        updateLikeBtn(true, currentCount + 1);
+      }
+    } catch (err) {
+      console.error("[GC] Like failed:", err);
+    } finally {
+      isFetchingLike = false;
+      likeBtn.style.opacity = "1";
+    }
+  });
+
+  // ── Comment — navigate to topic page (last post, ready to reply) ──────────
+  commentBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!currentUser) {
+      window.location.href = `/login?return_path=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
+
+    // Open Discourse compose dialog in-place (no navigation needed)
+    try {
+      const store = api?.container?.lookup("service:store");
+      const composer = api?.container?.lookup("service:composer");
+      if (store && composer && topicId) {
+        const topic = await store.find("topic", parseInt(topicId, 10));
+        await composer.open({
+          action: "reply",
+          topic,
+          draftKey: topic.draft_key,
+        });
+        return;
+      }
+    } catch (err) {
+      console.error("[GC] Failed to open composer inline:", err);
+    }
+
+    // Fallback: navigate to topic page
+    if (titleHref) window.location.href = titleHref;
+  });
+
   // ── Bookmark — persisted via Discourse API ─────────────────────────────────
-  const bookmarkBtn = footer.querySelector(".gc-bookmark-action");
   let bookmarkId = card.dataset.bookmarkId || null;
 
-  // Restore bookmark state if Discourse already marks the topic as bookmarked
   if (card.classList.contains("bookmarked") || card.dataset.bookmarked === "true") {
     bookmarkBtn.classList.add("is-active");
     bookmarkBtn.innerHTML = ICONS.bookmarkFill;
@@ -412,7 +527,6 @@ const enhanceCard = (card, currentUser) => {
   });
 
   // ── More menu — Discourse API actions ─────────────────────────────────────
-  const moreBtn = footer.querySelector(".gc-more-action");
   moreBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -468,7 +582,7 @@ export default apiInitializer("1.14.0", (api) => {
       .querySelectorAll(".topic-list-item:not(.gc-topic-card-enhanced)")
       .forEach((card) => {
         card.classList.add("gc-topic-card", "gc-topic-card-enhanced");
-        enhanceCard(card, currentUser);
+        enhanceCard(card, currentUser, api);
       });
     injectLoadMoreButton();
   };
@@ -485,11 +599,11 @@ export default apiInitializer("1.14.0", (api) => {
         if (node.nodeType !== 1) continue;
         if (node.classList?.contains("topic-list-item") && !node.classList.contains("gc-topic-card-enhanced")) {
           node.classList.add("gc-topic-card", "gc-topic-card-enhanced");
-          enhanceCard(node, currentUser);
+          enhanceCard(node, currentUser, api);
         }
         node.querySelectorAll?.(".topic-list-item:not(.gc-topic-card-enhanced)").forEach((el) => {
           el.classList.add("gc-topic-card", "gc-topic-card-enhanced");
-          enhanceCard(el, currentUser);
+          enhanceCard(el, currentUser, api);
         });
         if (node.matches?.(".more-topics, #topic-list-bottom")) {
           setTimeout(injectLoadMoreButton, 50);
